@@ -18,11 +18,11 @@ export default function Contribute ({navigation}){
     const [amount, setAmount] = useState({value:''})
     const [amountdue, setAmountdue] = useState({value:''})
     const [bal, setBal] = useState({value:''})
-    const[prevbal,setPrevBal]=useState(0)
+    const [prevbal,setPrevBal]=useState(0)
     const [caseload,setCaseload]=  useState([])
     const [loggeduser,setLogged]=  useState('')
-    const[benmemberid,setBenMembId] = useState({value:''});
-    const[caseid,setCaseId] = useState({value:''});
+    const [benmemberid,setBenMembId] = useState({value:''});
+    const [caseid,setCaseId] = useState({value:''});
     
     const user=()=>{
       AsyncStorage.getItem('user').then((item) => {
@@ -85,8 +85,7 @@ export default function Contribute ({navigation}){
               }
              
           }).catch(err=>console.log(err))
-          
-         
+               
         
       }
 
@@ -132,6 +131,7 @@ export default function Contribute ({navigation}){
             let balance= parseInt(amountdue.value)-parseInt(amount.value)+parseInt(prevbal)
       
             setBal({value:balance.toString()})
+          
 
         }
 
@@ -204,7 +204,7 @@ export default function Contribute ({navigation}){
             error={!!amount.error}
             errorText={amount.error}
             />
-               <TextInput
+            <TextInput
             label="Balance"
             returnKeyType="next"
             value={bal.value}
@@ -217,6 +217,7 @@ export default function Contribute ({navigation}){
             <Button
             mode="contained"
             onPress={() => {
+              
               onSubmit()
               navigation.navigate('PurchaseProduct',{
                 conmemberid:loggeduser._id,

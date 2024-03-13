@@ -2,7 +2,7 @@
   "expo": {
     "name": "KWA",
     "slug": "KWA",
-    "version": "1.0.0",
+    "version": "2.2.7",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,7 +16,9 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.philome.KWA"
+      "bundleIdentifier": "com.philome.KWA",
+      "buildNumber":"14"
+
     },
     "android": {
       "adaptiveIcon": {
@@ -32,6 +34,15 @@
       "eas": {
         "projectId": "3a3e1326-4239-4d6d-acca-cc9d9559534d"
       }
-    }
+    },
+    "plugins": [
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.philome.KWA"
+        
+        }
+      ]
+    ]
   }
 }

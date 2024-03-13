@@ -20,29 +20,16 @@ export default function ResetPasswordScreen({ navigation }) {
       setEmail({ ...email, error: emailError })
       return
     }
-    // Parse.setAsyncStorage(AsyncStorage);
-    // Parse.initialize('CDjcbNIsK7y7L7wZXaRquOdgCNidDcobchhc0akT','5GuFwL15GHO8qF7jzR3MpxyfCJ25uqMwlVqHReBV');
-    // Parse.serverURL = 'https://parseapi.back4app.com/';
-
-    // Parse.User.requestPasswordReset(email.value)
-    // .then(()=>{
-    //   Alert.alert('Reset Successfull. Check your email')
-
-    // }).catch((err)=>{
-    //   Alert.alert('Error '+err.message)
-      
-    // })
-    
-    //reset email endpoint
+  
    
     const url=''+conn+'/forgotpassword';
     axios.post(url,{email:email.value})
     .then(res=>{
       
-      alert("Success!!"+res.data.message);
+      Alert.alert("Success!!"+res.data.message);
       navigation.navigate('Login')
     }).catch(err=>{
-      alert("No such email exists")
+      Alert.alert("No such email exists "+err.message)
       return
     })
 
@@ -54,8 +41,8 @@ export default function ResetPasswordScreen({ navigation }) {
       <Logo />
       <Header>Restore Password</Header>
       <TextInput
-        label="E-mail address"
-        returnKeyType="done"
+        label="Email"
+        returnKeyType="next"
         value={email.value}
         onChangeText={(text) => setEmail({ value: text, error: '' })}
         error={!!email.error}

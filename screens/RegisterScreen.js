@@ -34,21 +34,21 @@ export default function RegisterScreen({ navigation }) {
     const emailError = emailValidator(email.value)
     const passwordError = passwordValidator(password.value)
     const conpasswordError = confirmpasswordValidator(password.value,confirmpwd.value)
-    const phoneError = phoneValidator(phone.value)
     const termsError = termsValidator(isSelected)
     
     if(termsError) Alert.alert("Please accept terms & conditions")
     
     
-    if (emailError || passwordError || nameError||conpasswordError||phoneError||termsError) {
+    if (emailError || passwordError || nameError||conpasswordError||termsError) {
       setName({ ...name, error: nameError })
       setEmail({ ...email, error: emailError })
       setPassword({ ...password, error: passwordError })
       setConfirmpwd({ ...confirmpwd, error: conpasswordError })
-      setPhone({...phone,error:phoneError})
+      setPhone({...phone})
       setSelection({...isSelected})
       return
     }else{
+     
       const formdata = new FormData()
 
       formdata.append('memberImage',{
@@ -110,7 +110,7 @@ export default function RegisterScreen({ navigation }) {
   
     <Background>
       
-    <BackButton goBack={()=>navigation.goBack()} />
+    
      
       <Header>Create Account</Header>
       <TextInput
@@ -134,12 +134,10 @@ export default function RegisterScreen({ navigation }) {
         keyboardType="email-address"
       />
         <TextInput
-        label="Phone"
+        label="Phone(Optional)"
         returnKeyType="next"
         value={phone.value}
         onChangeText={(text) => setPhone({ value: text })}
-        error={!!phone.error}
-        errorText={phone.error}
         autoCapitalize="none"
         keyboardType="numeric"
       />

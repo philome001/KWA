@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+  <domain-config cleartexttrafficpermitted="true">
+    <domain includesubdomains="false">localhost</domain>
+    <domain includesubdomains="false">178.32.147.81</domain>
+  </domain-config>
+</network-security-config>

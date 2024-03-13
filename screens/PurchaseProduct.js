@@ -8,9 +8,11 @@ import Header from '../components/Header'
 import {conn} from '../screens/utils/Conn'
 import {theme} from '../themes/theme';
 import PaymentScreen from './PaymentScreen';
-
+import { fetchPublishableKey } from '../helpers/fetchPublishableKey';
 import { colors } from '../colors';
 import { CardField, useConfirmPayment } from '@stripe/stripe-react-native';
+import { PlatformPayButton, usePlatformPay,PlatformPay,StripeProvider } from '@stripe/stripe-react-native';
+
 
 const PurchaseProduct = ({route,navigation}) => {
 
@@ -24,13 +26,13 @@ const PurchaseProduct = ({route,navigation}) => {
   const[benid,setBenMembId] = useState('');
   const[beneficiaryname,setBenName] = useState('');
   const[caseid,setCaseId] = useState('');
-
-
+  const [publishableKey, setPublishableKey] = useState('');
+  const {isPlatformPaySupported,confirmPlatformPayPayment}=usePlatformPay();
+  const [isApplePaySupported, setIsApplePaySupported] = useState(false);
   const [saveCard, setSaveCard] = useState(false);
   const { confirmPayment, loading } = useConfirmPayment();
-
   const fetchPaymentIntentClientSecret = async () => {
-    const response = await fetch(''+conn+'/create-payment', {
+  const response = await fetch(''+conn+'/create-payment', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -93,6 +95,67 @@ const PurchaseProduct = ({route,navigation}) => {
       
     }
   };
+
+
+  const pay = async () => {
+    const clientSecret = await fetchPaymentIntentClientSecret()
+        
+    const { paymentIntent,error } = await confirmPlatformPayPayment(
+      clientSecret,
+      {
+        applePay: {
+          cartItems: [
+            {
+              label: 'Donation amount',
+              amount: amount,
+              paymentType: PlatformPay.PaymentType.Immediate,
+            },
+            {
+              label: 'Total',
+              amount: amount,
+              paymentType: PlatformPay.PaymentType.Immediate,
+            },
+          ],
+          merchantCountryCode: 'US',
+          currencyCode: 'USD',
+         
+        },
+      }
+    );
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+      console.log('Payment confirmation error', error.message);
+    } else {
+      //Alert.alert('Success', 'Check the logs for payment intent details.');
+      //console.log(JSON.stringify(paymentIntent, null, 2));
+      const data={
+        paymentId:paymentIntent.id,
+        InvNo:caseid,
+        conmemberid:conmemberid,
+        description:paymentIntent.description,
+        benmemberid: benid,
+        amount:paymentIntent.amount/100,
+        amountdue:amountdue,
+        balance:balance,
+        beneficiaryname:beneficiaryname,
+        email:email,
+        date: new Date().toDateString()
+          
+        }
+        
+      const url=''+conn+'/contribute';
+      await axios.post(url,data)
+      .then(res=>{
+        
+        if(res){
+          alert("The payment confirmed successfully!");
+                  navigation.replace('DashboardForm'); 
+        }
+      })
+      .catch(err=>alert(err.message))
+     
+    }
+  };
   useEffect(() => {
     
     const {
@@ -117,8 +180,29 @@ const PurchaseProduct = ({route,navigation}) => {
     
     }
   ,[])
-  
 
+  // useEffect(() => {
+  //   (async function () {
+      
+  //     const res = await isPlatformPaySupported()
+  //     setIsApplePaySupported(res);
+  //     console.log('Apple support is '+res)
+    
+  //   })();
+    
+  // }, [isApplePaySupported]); 2nd comment
+  
+  // useEffect(() => {
+  //   async function initialize() {
+  //     const data = await fetchPublishableKey();
+  //     const publishableKey = data.key;
+  //     setPublishableKey(publishableKey)
+
+  //    }
+  //    initialize();
+   
+  // }, []); 1st comment 
+  
 
   return (
   <ImageBackground
@@ -128,7 +212,38 @@ const PurchaseProduct = ({route,navigation}) => {
   
   <View style={styles.container}>
      
-  <PaymentScreen>
+ <PaymentScreen>
+  {/* {isApplePaySupported ?<View>
+    <StripeProvider merchantIdentifier='merchant.com.philome.KWA' publishableKey={publishableKey}> 
+      (
+        <PlatformPayButton
+          onPress={pay}
+          type={PlatformPay.ButtonType.Pay}
+          appearance={PlatformPay.ButtonStyle.Black}
+          borderRadius={4}
+          style={{
+            width: '100%',
+            height: 50,
+          }}
+        />
+      )
+    </StripeProvider>
+    </View>:
+     Alert.alert(
+      'Appe Pay Alert',
+      'Apple Pay not supported,check if card is properly loaded!!',
+      [
+      
+        
+        {text: 'OK', onPress: ()=>{navigation.replace('Contribute')},
+        style:"cancel"
+        },
+      
+
+      ],
+     
+    ) */}
+  
       <View>
       <Text style={styles.titleText}>Enter Card Details</Text>
       <TextInput
@@ -153,12 +268,8 @@ const PurchaseProduct = ({route,navigation}) => {
           cvc: 'CVC',
           expiration: 'MM|YY',
         }}
-        onCardChange={(cardDetails) => {
-          console.log('cardDetails', cardDetails);
-        }}
-        onFocus={(focusedField) => {
-          console.log('focusField', focusedField);
-        }}
+       
+       
         cardStyle={styles.cardStyle}
         style={styles.cardField}
       />
@@ -176,7 +287,8 @@ const PurchaseProduct = ({route,navigation}) => {
         loading={loading}
       />
       </View>
-    </PaymentScreen>
+    {/*}*/}
+  </PaymentScreen>
    
     
   </View>

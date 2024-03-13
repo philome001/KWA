@@ -1,6 +1,6 @@
 import React, { useState,useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TouchableOpacity, StyleSheet,View, Alert, } from 'react-native'
+import { TouchableOpacity, StyleSheet,View, ActivityIndicator, } from 'react-native'
 import { Text } from 'react-native-paper'
 import axios from 'axios';
 
@@ -16,14 +16,17 @@ import TextInput from '../components/TextInput'
 import { theme } from '../themes/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
+
 var bcrypt = require('bcryptjs');
 export default function Login({ navigation }) {
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
   const [members,setMembers]=useState([]);
   const [devicetoken,setDevicetoken]=useState('')
+  const [isLoading,setIsLoading]=useState(false);
  
-  const onLoginPressed = () => {
+  const onLoginPressed = async() => {
+ 
     
     const emailError = emailValidator(email.value)
     const passwordError = passwordValidator(password.value)
@@ -33,18 +36,21 @@ export default function Login({ navigation }) {
       setPassword({ ...password, error: passwordError })
       return
     }else{
+      setIsLoading(true)
       let mail=email.value;
       let pwd = password.value;
       let userpwd='';
       let username='';
             
       const url=''+conn+'/getmember/'+mail
+      
+      await axios.get(url)
      
-      axios.get(url)
     
       .catch(err=>alert('Fail'+err))
       .then(response=>{
-            
+            setIsLoading(false)
+                     
             userpwd=response.data.password;
             username=response.data.email;
 
@@ -70,7 +76,7 @@ export default function Login({ navigation }) {
         }
          
       }).catch(err=>{
-          alert('Wrong '+err)
+          alert('Wrong2 '+err)
                   
    }) 
 
@@ -125,7 +131,23 @@ export default function Login({ navigation }) {
        
     }
 })
-  return (
+useEffect(()=>{
+  axios.get('https://kenyawelfareassociation.com/getmember/admin@admin.com')
+  //axios.get('https://ubid.co.ke')
+  .then(function (response) {
+    console.log(response.data);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  // const url='https://incomplete-chain.badssl.com'
+  // axios.get(url).then((res=>{
+  //   alert('connected')
+  // })).catch(err=>console.log('kuna '+err))
+
+},[])
+
+return (
     
     <Background>
        <Logo/>
@@ -163,9 +185,12 @@ export default function Login({ navigation }) {
           <Text style={styles.forgot}>Forgot your password?</Text>
         </TouchableOpacity>
       </View>
-      <Button mode="contained" onPress={onLoginPressed}>
+      {isLoading===false?(<Button mode="contained" onPress={onLoginPressed}>
         Login
-      </Button>
+      </Button>):(<View style={styles.loading}><ActivityIndicator size='large'/></View>
+       
+      )}  
+
       <View style={styles.row}>
         <Text>Don’t have an account? </Text>
         <TouchableOpacity onPress={() => navigation.replace('RegisterScreen')}>
@@ -196,4 +221,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: theme.colors.primary,
   },
+  loading: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
 })

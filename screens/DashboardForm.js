@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
             shadowOpacity: 1,
             shadowRadius: 8,
             elevation: 8,
-            shadowOffset: {width: 0, height: 0},
+            //shadowOffset: {width: 0, height: 0},
             margin:10,
             width:149,
             height:130
